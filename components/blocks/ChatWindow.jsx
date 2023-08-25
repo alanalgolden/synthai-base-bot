@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Chat from "../../api/chat";
+import Chat from "../../app/api/chat/useChat";
 
 const ChatWindow = (props) => {
   return <Chat />;
