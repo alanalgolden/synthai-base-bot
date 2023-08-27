@@ -1,21 +1,69 @@
 "use client";
 
+import { uuidv4 } from "@firebase/util";
 import { useChat } from "ai/react";
+import { useEffect, useState } from "react";
+import { useMessage } from "../../../../context/MessageContext/context";
 import { useUser } from "../../../../context/UserContext/context";
 import { upsertDoc } from "../../firebase/upsertDoc/route";
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
-  const { user } = useUser();
+  // IMPORTED CONTEXT
+  //const { user } = useUser();
 
-  const handleDoc = async () => {
-    upsertDoc(user.uid, "1", "test message2");
+  const { setMessage, message } = useMessage();
+
+  // CHAT CONFIG
+  const placeholderConfig = "How can I help?";
+
+  //const collectionConfig = user?.uid;
+
+  // STATES
+  const [counter, setCounter] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+
+  //const [uniqueId, setUniqueId] = useState(null);
+
+  // FUNCTIONS
+  const toggleFinished = () => {
+    setIsFinished(true);
   };
 
-  const placeholderDef = "How can I help?";
+  // CONVERSATION MANAGER
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    onFinish: toggleFinished,
+  });
+
+  // Coming back to these, they are part of logging the conversation, I want to focus on Pinecone instead.
+  /*   let data = {
+    messageArray: [{ mCount: counter, mContent: messages[counter]?.content }],
+  };
+
+  const saveMessage = async () => {
+    await upsertDoc(collectionConfig, uniqueId, data);
+  };
+ */
+
+  //EFFECTS
+  useEffect(() => {
+    // Prevents infinite loop by not allowing function to run if messages[0] is still undefined.
+    if (messages[counter]) {
+      // LOGIC : If the user sent the message, then it doesn't need to wait for onFinished from text stream.
+      if (messages[counter].role === "user") {
+        setMessage(messages[counter]);
+        setCounter((prevCounter) => prevCounter + 1);
+      }
+      // LOGIC : Prevents message from being set until it is fully finished, using the onFinish callback from chat stream.
+      else if (messages[counter].role === "assistant" && isFinished === true) {
+        setMessage(messages[counter]);
+        setCounter((prevCounter) => prevCounter + 1);
+        setIsFinished(false);
+      }
+    }
+  }, [messages, isFinished]);
 
   return (
-    <div className="bg-slate-900 flex justify-center h-screen">
+    <div className="bg-slate-900 flex justify-center h-fit max-h-[80%]">
       <div className="border-slate-500 border-4 rounded-md  mt-4 w-full max-w-5xl max-h-[80%] flex flex-col">
         <div className="flex-grow overflow-scroll">
           {messages.map((m) => (
@@ -39,7 +87,7 @@ export default function Chat() {
             <input
               className="flex-grow my-4 py-2 pl-2 rounded-md bg-slate-700"
               value={input}
-              placeholder={placeholderDef}
+              placeholder={placeholderConfig}
               onChange={handleInputChange}
             />
             <button
@@ -49,7 +97,9 @@ export default function Chat() {
               Send
             </button>
             <button
-              onClick={handleDoc}
+              onClick={() => {
+                console.log(message);
+              }}
               className="py-2 px-4 ml-2 rounded-md bg-slate-600"
             >
               Test
