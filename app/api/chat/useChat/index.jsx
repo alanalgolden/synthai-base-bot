@@ -1,9 +1,16 @@
 "use client";
 
 import { useChat } from "ai/react";
+import { useUser } from "../../../../context/UserContext/context";
+import { upsertDoc } from "../../firebase/upsertDoc/route";
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { user } = useUser();
+
+  const handleDoc = async () => {
+    upsertDoc(user.uid, "1", "test message2");
+  };
 
   const placeholderDef = "How can I help?";
 
@@ -40,6 +47,12 @@ export default function Chat() {
               type="submit"
             >
               Send
+            </button>
+            <button
+              onClick={handleDoc}
+              className="py-2 px-4 ml-2 rounded-md bg-slate-600"
+            >
+              Test
             </button>
           </form>
         </div>

@@ -1,13 +1,13 @@
 import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 
+// ! I'd like for this to be inside the useChat folder, and for the index.js to be in components, but the path redecleration for the API
+// ! Is not working correctly. Leaving it here until I can do a fix.
+
 //Create OpenAI API Client
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
 });
-
-// Set the runtime to edge
-//export const runtime = "edge";
 
 export async function POST(req) {
   try {
