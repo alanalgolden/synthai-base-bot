@@ -90,6 +90,7 @@ export default function Chat() {
               placeholder={placeholderConfig}
               onChange={handleInputChange}
             />
+            {/* <span className="...">Press ⮐ to send</span> */}
             <button
               className="py-2 px-4 ml-2 rounded-md bg-slate-600"
               type="submit"
