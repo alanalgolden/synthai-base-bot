@@ -3,6 +3,7 @@
 import { uuidv4 } from "@firebase/util";
 import { useChat } from "ai/react";
 import { useEffect, useState } from "react";
+import Sidebar from "../../../../components/blocks/Sidebar";
 import { useMessage } from "../../../../context/MessageContext/context";
 import { useUser } from "../../../../context/UserContext/context";
 import { upsertDoc } from "../../firebase/upsertDoc/route";
@@ -63,8 +64,8 @@ export default function Chat() {
   }, [messages, isFinished]);
 
   return (
-    <div className="bg-slate-900 flex justify-center h-fit max-h-[80%]">
-      <div className="border-slate-500 border-4 rounded-md  mt-4 w-full max-w-5xl max-h-[80%] flex flex-col">
+    <div className="bg-slate-900 w-[100%] flex justify-center overflow-scroll max-h-[80vh]">
+      <div className="border-slate-500 border-4 rounded-md  mt-4 w-full max-w-5xl flex flex-col">
         <div className="flex-grow overflow-scroll">
           {messages.map((m) => (
             <div key={m.id}>

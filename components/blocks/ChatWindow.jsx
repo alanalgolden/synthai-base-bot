@@ -1,9 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Chat from "../../app/api/chat/useChat";
+import Sidebar from "./Sidebar";
 
 const ChatWindow = (props) => {
-  return <Chat />;
+  return (
+    <div className="flex justify-center">
+      <Chat />
+    </div>
+  );
 };
 
 ChatWindow.propTypes = {
