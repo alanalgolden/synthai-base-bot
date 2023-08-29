@@ -64,8 +64,8 @@ export default function Chat() {
   }, [messages, isFinished]);
 
   return (
-    <div className="bg-slate-900 w-[100%] flex justify-center overflow-scroll max-h-[80vh]">
-      <div className="border-slate-500 border-4 rounded-md  mt-4 w-full max-w-5xl flex flex-col">
+    <div className="bg-slate-900 w-full flex justify-center overflow-scroll  max-h-[80vh]">
+      <div className="border-slate-500 border-4 rounded-md  mt-4 min-w-[30rem] w-[60rem] max-w-5xl flex flex-col">
         <div className="flex-grow overflow-scroll">
           {messages.map((m) => (
             <div key={m.id}>

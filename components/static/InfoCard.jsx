@@ -7,7 +7,7 @@ const InfoCard = () => {
   const { user } = useUser();
 
   return (
-    <div className="p-2 md:px-8 md:py-4 rounded bg-[#25252d] w-full max-h-[50%] overflow-hidden">
+    <div className="p-2 md:px-8 md:py-4 rounded bg-[#25252d] max-h-[50%]">
       <div className="flex justify-between">
         <h1 className="text-2xl mb-4">🤖 SynthAI Base Bot</h1>
         {!user ? <GoogleSignInButton /> : <LogoutButton />}
