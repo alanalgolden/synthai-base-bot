@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Roboto_Mono } from "next/font/google";
+import Sidebar from "../components/blocks/Sidebar";
 
 const font = Roboto_Mono({
   subsets: ["cyrillic"],
@@ -33,7 +34,12 @@ export default function RootLayout({ children }) {
           content="Base Chatbot, custom built for SynthAI."
         />
       </head>
-      <body className={font.className}>{children}</body>
+      <body className={font.className}>
+        <div className="fixed top-0 left-0 h-screen w-64 bg-gray-800">
+          <Sidebar />
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
