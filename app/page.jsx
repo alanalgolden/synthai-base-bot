@@ -1,32 +1,20 @@
-"use client";
-
-import Link from "next/link";
-import Footer from "../components/blocks/Footer";
-import Sidebar from "../components/blocks/Sidebar";
-import InfoCard from "../components/static/InfoCard";
 import { MessageProvider } from "../context/MessageContext/context";
 import { UserProvider } from "../context/UserContext/context";
+
 import Chat from "./api/chat/useChat";
+import Homepage from "./pages/home/page";
+/* import getPineconeIndexes from "./util/getPineconeIndexes/util"; */
 
 export default function Home() {
+  /*   const testPine = async () => {
+    getPineconeIndexes();
+  }; */
+
   return (
     <>
       <UserProvider>
         <MessageProvider>
-          <div className="h-screen bg-slate-900">
-            <div className="flex">
-              <div
-                className="flex-auto p-8 overflow-x-auto overflow-y-auto ml-64 min-w-[40rem] bg-slate-900"
-                style={{ minHeight: "100vh", width: "max-content" }}
-              >
-                <div>
-                  <InfoCard />
-                  <Chat />
-                  <Footer />
-                </div>
-              </div>
-            </div>
-          </div>
+          <Homepage />
         </MessageProvider>
       </UserProvider>
     </>

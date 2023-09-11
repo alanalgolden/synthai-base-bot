@@ -4,6 +4,7 @@ const getMatchesFromEmbeddings = async (embeddings, topK, namespace) => {
   const pinecone = await getPineconeClient();
 
   const indexes = await pinecone.listIndexes();
+  console.log(indexes);
 
   if (
     !indexes.includes(
