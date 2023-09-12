@@ -1,4 +1,4 @@
-import getPineconeClient from "../../../../pineconeConfig";
+/* import getPineconeClient from "../../../../pineconeConfig";
 import "server-only";
 
 export async function GET(req) {
@@ -7,3 +7,4 @@ export async function GET(req) {
 
   console.log(indexes);
 }
+ */

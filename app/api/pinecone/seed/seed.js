@@ -1,4 +1,4 @@
-import {
+/* import {
   RecursiveCharacterTextSplitter,
   MarkdownTextSplitter,
   Document,
@@ -121,3 +121,4 @@ async function prepareDocument(page, splitter) {
 }
 
 export default seed;
+ */

@@ -1,4 +1,4 @@
-import seed from "app/api/pinecone/seed/seed";
+/* import seed from "app/api/pinecone/seed/seed";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -15,3 +15,4 @@ export async function POST(req) {
     return NextResponse.json({ success: false, error: "Failed crawling" });
   }
 }
+ */

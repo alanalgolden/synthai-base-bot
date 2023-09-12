@@ -12,8 +12,13 @@ export default function Chat() {
   // IMPORTED CONTEXT
   //const { user } = useUser();
 
-  const { setMessage, message } = useMessage();
+  const messageContext = useMessage();
 
+  if (!messageContext) {
+    return null;
+  }
+
+  const { setMessage, message } = messageContext;
   // CHAT CONFIG
   const placeholderConfig = "How can I help?";
 

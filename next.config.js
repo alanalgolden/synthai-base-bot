@@ -18,6 +18,15 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/vectors/:path*",
+        destination:
+          "https://base-bot-core-92d4948.svc.us-east4-gcp.pinecone.io/vectors/:path*",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

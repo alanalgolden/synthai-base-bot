@@ -1,4 +1,4 @@
-import getPineconeClient from "../../../../pineconeConfig";
+/* import getPineconeClient from "../../../../pineconeConfig";
 import getEmbeddings from "../../openai/getEmbeddings/route";
 import "server-only";
 
@@ -12,3 +12,4 @@ export async function GET(req) {
   const data = await index.upsert([{ id: "B", values: embedding }]);
   console.log(data);
 }
+ */

@@ -1,4 +1,4 @@
-import { addToIndex } from "./addToIndex/route";
+/* import { addToIndex } from "./addToIndex/route";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
@@ -7,3 +7,4 @@ export default async function handler(req, res) {
     res.status(405).json({ message: "Method not allowed" });
   }
 }
+ */
