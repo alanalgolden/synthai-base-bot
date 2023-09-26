@@ -1,4 +1,3 @@
-import seed from "app/api/pinecone/seed/seed";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";

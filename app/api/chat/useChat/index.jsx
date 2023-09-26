@@ -1,29 +1,26 @@
 "use client";
 
-import { uuidv4 } from "@firebase/util";
 import { useChat } from "ai/react";
 import { useEffect, useState } from "react";
-import Sidebar from "../../../../components/blocks/Sidebar";
 import { useMessage } from "../../../../context/MessageContext/context";
-import { useUser } from "../../../../context/UserContext/context";
-import { upsertDoc } from "../../firebase/upsertDoc/route";
 
 export default function Chat() {
   // IMPORTED CONTEXT
-  //const { user } = useUser();
-
-  const { setMessage, message } = useMessage();
+  const {
+    setMessage,
+    message,
+    messageRole,
+    setMessageRole,
+    lastMessage,
+    setLastMessage,
+  } = useMessage();
 
   // CHAT CONFIG
   const placeholderConfig = "How can I help?";
 
-  //const collectionConfig = user?.uid;
-
   // STATES
   const [counter, setCounter] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
-
-  //const [uniqueId, setUniqueId] = useState(null);
 
   // FUNCTIONS
   const toggleFinished = () => {
@@ -34,16 +31,6 @@ export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     onFinish: toggleFinished,
   });
-
-  // Coming back to these, they are part of logging the conversation, I want to focus on Pinecone instead.
-  /*   let data = {
-    messageArray: [{ mCount: counter, mContent: messages[counter]?.content }],
-  };
-
-  const saveMessage = async () => {
-    await upsertDoc(collectionConfig, uniqueId, data);
-  };
- */
 
   //EFFECTS
   useEffect(() => {

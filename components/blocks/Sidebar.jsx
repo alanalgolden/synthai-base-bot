@@ -9,12 +9,16 @@ const Sidebar = () => {
           <ul>
             <li>
               <button>
-                <Link href="/">Home</Link>
+                <Link href="/" className="hover:text-slate-300">
+                  Home
+                </Link>
               </button>
             </li>
             <li>
               <button>
-                <Link href="pages/enter-data">Enter Data</Link>
+                <Link href="/manage-data" className="hover:text-slate-300">
+                  Manage Data
+                </Link>
               </button>
             </li>
           </ul>
