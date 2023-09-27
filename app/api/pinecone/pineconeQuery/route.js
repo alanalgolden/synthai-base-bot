@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(req, res) {
   const reqData = await req.json();
-  const url =
-    "https://base-bot-92d4948.svc.us-east4-gcp.pinecone.io/vectors/upsert";
+
+  console.log(reqData.vector);
+  const url = "https://base-bot-92d4948.svc.us-east4-gcp.pinecone.io/query";
   const options = {
     method: "POST",
     headers: {
@@ -15,13 +16,12 @@ export async function POST(req, res) {
     },
 
     body: JSON.stringify({
-      vectors: [
-        {
-          id: reqData.id,
-          values: reqData.embedding,
-          metadata: reqData.metadata,
-        },
-      ],
+      includeValues: reqData.includeValues,
+      includeMetadata: reqData.includeMetadata,
+      topK: reqData.topK,
+      namespace: reqData.namespace,
+      vector: reqData.vector,
+      filter: reqData.filter ? reqData.filter : undefined,
     }),
   };
   try {

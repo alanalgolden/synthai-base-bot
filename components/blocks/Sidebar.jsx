@@ -21,6 +21,13 @@ const Sidebar = () => {
                 </Link>
               </button>
             </li>
+            <li>
+              <button>
+                <Link href="/view-data" className="hover:text-slate-300">
+                  View Data
+                </Link>
+              </button>
+            </li>
           </ul>
         </div>
       </div>

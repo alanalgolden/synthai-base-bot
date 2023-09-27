@@ -5,6 +5,7 @@ module.exports = {
     "./components/*.{js,jsx}",
     "./components/blocks/*",
     "./components/static/*",
+    "./components/cards/*",
   ],
   theme: {
     extend: {
