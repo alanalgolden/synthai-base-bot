@@ -3,6 +3,7 @@
 import { useChat } from "ai/react";
 import { useEffect, useState } from "react";
 import { useMessage } from "../../../../context/MessageContext/context";
+import ReactMarkdown from "react-markdown";
 
 export default function Chat() {
   // IMPORTED CONTEXT
@@ -32,7 +33,18 @@ export default function Chat() {
     onFinish: toggleFinished,
   });
 
-  //EFFECTS
+  // CONTROLS TEXT AREA SIZE
+  const handleTextAreaChange = (e) => {
+    handleInputChange(e);
+    const lineHeight = 20; // Assume each line is approx 20px high. Adjust based on your styling
+    const maxVisibleLines = 10;
+    const currentLines = e.target.value.split("\n").length;
+
+    // Set rows to the lesser of currentLines or maxVisibleLines
+    e.target.rows = Math.min(currentLines, maxVisibleLines);
+  };
+
+  // EFFECTS
   useEffect(() => {
     // Prevents infinite loop by not allowing function to run if messages[0] is still undefined.
     if (messages[counter]) {
@@ -50,33 +62,79 @@ export default function Chat() {
     }
   }, [messages, isFinished]);
 
+  // STYLING
+  const markdownStyles = {
+    h1: "text-2xl font-bold mb-2",
+    h2: "text-xl font-bold mb-1",
+    h3: "text-lg font-bold",
+    h4: "text-base font-semibold",
+    // Add more styles as needed
+  };
+
   return (
-    <div className="bg-slate-900 w-full flex justify-center overflow-scroll  max-h-[80vh]">
-      <div className="border-slate-500 border-4 rounded-md  mt-4 min-w-[30rem] w-[60rem] max-w-5xl flex flex-col">
-        <div className="flex-grow overflow-scroll">
+    <div className="bg-slate-900 w-full flex justify-center   max-h-[80vh]">
+      <div className="border-slate-500 border-4 rounded-md  mt-4 min-w-[30rem] w-[60rem] flex flex-col">
+        <div className="flex-grow">
           {messages.map((m) => (
             <div key={m.id}>
               {m.role === "user" ? (
-                <div className="pl-2 pt-2 pb-4 bg-slate-800">
+                <div className="pl-2 pt-2 pb-4 bg-slate-800 whitespace-pre-line">
                   {"User: "}
-                  {m.content}
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ node, ...props }) => (
+                        <h1 className={markdownStyles.h1} {...props} />
+                      ),
+                      h2: ({ node, ...props }) => (
+                        <h2 className={markdownStyles.h2} {...props} />
+                      ),
+                      h3: ({ node, ...props }) => (
+                        <h3 className={markdownStyles.h3} {...props} />
+                      ),
+                      h4: ({ node, ...props }) => (
+                        <h1 className={markdownStyles.h4} {...props} />
+                      ),
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
                 </div>
               ) : (
-                <div className="pl-2 pt-2 pb-4 bg-slate-600">
+                <div className="pl-2 pt-2 pb-4 bg-slate-600 whitespace-pre-line">
                   {"AI: "}
-                  {m.content}
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ node, ...props }) => (
+                        <h1 className={markdownStyles.h1} {...props} />
+                      ),
+                      h2: ({ node, ...props }) => (
+                        <h2 className={markdownStyles.h2} {...props} />
+                      ),
+                      h3: ({ node, ...props }) => (
+                        <h3 className={markdownStyles.h3} {...props} />
+                      ),
+                      h4: ({ node, ...props }) => (
+                        <h1 className={markdownStyles.h4} {...props} />
+                      ),
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
                 </div>
               )}
             </div>
           ))}
         </div>
+
         <div className="bg-slate-500 px-4 ">
           <form onSubmit={handleSubmit} className="flex items-center">
-            <input
-              className="flex-grow my-4 py-2 pl-2 rounded-md bg-slate-700"
+            <textarea
+              className="flex-grow my-4 py-2 pl-2 rounded-md bg-slate-700 overflow-auto max-h-[200px]"
+              rows="1"
               value={input}
               placeholder={placeholderConfig}
-              onChange={handleInputChange}
+              onChange={handleTextAreaChange}
+              style={{ resize: "none" }}
             />
             {/* <span className="...">Press ⮐ to send</span> */}
             <button
@@ -84,14 +142,6 @@ export default function Chat() {
               type="submit"
             >
               Send
-            </button>
-            <button
-              onClick={() => {
-                console.log(message);
-              }}
-              className="py-2 px-4 ml-2 rounded-md bg-slate-600"
-            >
-              Test
             </button>
           </form>
         </div>
