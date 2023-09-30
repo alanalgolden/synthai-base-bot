@@ -4,7 +4,7 @@ import Sidebar from "../components/blocks/Sidebar";
 
 const font = Roboto_Mono({
   subsets: ["cyrillic"],
-  weight: ["700"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
 export default function RootLayout({ children }) {

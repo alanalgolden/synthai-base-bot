@@ -4,28 +4,28 @@ import { useChat } from "ai/react";
 import { useEffect, useState } from "react";
 import { useMessage } from "../../../../context/MessageContext/context";
 import ReactMarkdown from "react-markdown";
+import { useInspiration } from "../../../../context/InspirationContext/context";
 
 export default function Chat() {
   // IMPORTED CONTEXT
-  const {
-    setMessage,
-    message,
-    messageRole,
-    setMessageRole,
-    lastMessage,
-    setLastMessage,
-  } = useMessage();
+  const { setMessage } = useMessage();
+  const { inspiration } = useInspiration();
 
   // CHAT CONFIG
   const placeholderConfig = "How can I help?";
 
-  // STATES
+  // REACT
   const [counter, setCounter] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [waiting, setWaiting] = useState(true);
 
   // FUNCTIONS
   const toggleFinished = () => {
     setIsFinished(true);
+  };
+
+  const toggleWaiting = () => {
+    setIsFinished(false);
   };
 
   // CONVERSATION MANAGER
@@ -74,12 +74,12 @@ export default function Chat() {
   return (
     <div className="bg-slate-900 w-full flex justify-center   max-h-[80vh]">
       <div className="border-slate-500 border-4 rounded-md  mt-4 min-w-[30rem] w-[60rem] flex flex-col">
-        <div className="flex-grow">
+        <div className="flex-grow overflow-y-scroll">
           {messages.map((m) => (
             <div key={m.id}>
               {m.role === "user" ? (
-                <div className="pl-2 pt-2 pb-4 bg-slate-800 whitespace-pre-line">
-                  {"User: "}
+                <div className="px-2 pt-2 pb-4 bg-slate-800 whitespace-pre-line">
+                  <p className="text-blue-500">{"User: "}</p>
                   <ReactMarkdown
                     components={{
                       h1: ({ node, ...props }) => (
@@ -101,7 +101,7 @@ export default function Chat() {
                 </div>
               ) : (
                 <div className="pl-2 pt-2 pb-4 bg-slate-600 whitespace-pre-line">
-                  {"AI: "}
+                  <p className="text-green-500">{"AI: "}</p>
                   <ReactMarkdown
                     components={{
                       h1: ({ node, ...props }) => (
@@ -120,6 +120,10 @@ export default function Chat() {
                   >
                     {m.content}
                   </ReactMarkdown>
+                  <div className="bg-slate-700 flex-col p-2 rounded-md">
+                    <p className="text-blue-400">Inspiration Vectors:</p>
+                    <div>{inspiration}</div>
+                  </div>
                 </div>
               )}
             </div>

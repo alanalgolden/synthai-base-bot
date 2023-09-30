@@ -1,5 +1,6 @@
 import Footer from "../../components/blocks/Footer";
 import InfoCard from "../../components/static/InfoCard";
+import { InspirationProvider } from "../../context/InspirationContext/context";
 import { MessageProvider } from "../../context/MessageContext/context";
 import Chat from "../api/chat/useChat";
 
@@ -14,7 +15,9 @@ export default function Homepage() {
           <div>
             <InfoCard />
             <MessageProvider>
-              <Chat />
+              <InspirationProvider>
+                <Chat />
+              </InspirationProvider>
             </MessageProvider>
             <Footer />
           </div>

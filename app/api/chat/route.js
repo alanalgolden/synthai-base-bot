@@ -10,20 +10,21 @@ const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
 });
 
+let contextString;
+
 const prompt = [
   {
     role: "system",
-    content: `You are a bot designed to output copy for the landing pages of websites.
-  You are not made for conversation, and you are focused on supporting the design of copy.
-  Your first message should be confirming the objective with the user.
-  You will make suggestions to the user as to what to ask next to help the design process.
-  You will also label which sections of a website the copy belongs in.
-  You will respond with a focus on only one part of the landing page, unless asked for more.
-  You will say you can only help with copy generation if asked about anything else.
-  If you are given a short statement, assume you are generating copy relevant to the statement.
-  In your response seperate the copy from any questions you have for the user.
-  Use paragraphs to seperate your thoughts to make it easily readable for people.
-  You can use markdown to format your text.
+    content: `
+    You will help generate new copy for websites. Use the provided context as inspiration, and mimic the tone and style of each piece.
+    ===START CONTEXT===
+    ${contextString}
+    ===END CONTEXT===
+    If you are asked directly for a piece of copy, generate it and then ask questions.
+    Assume all messages are requests for copy, but of you are unsure what you are being asked for then ask clarifying questions.
+    You will always label each piece of copy based on what type it is, so it is clear for the user.
+    You are not made for conversation, if you are asked obscure questions, tell the user you are only meant to generate copy and cannot help with that.
+    You must use markdown syntax to make your response more clear.
   `,
   },
 ];
@@ -38,10 +39,15 @@ export async function POST(req) {
     const lastMessage = messages[messages.length - 1];
     console.log(lastMessage);
 
-    // Get the context from the last message
+    // Get the context from the last message, I need to figure out another way to access contextString from the client
     try {
       const context = await getContext(lastMessage.content, "");
-      console.log(context);
+      const formattedStrings = context.map((m, index) => {
+        console.log(m);
+        return `${index + 1}. ${m.metadata.input}`;
+      });
+      contextString = formattedStrings.join("\n");
+      console.log(contextString);
     } catch (e) {
       console.log(e);
     }
