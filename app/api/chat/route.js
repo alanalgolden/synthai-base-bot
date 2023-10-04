@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse, Message } from "ai";
+import { v4 as uuidv4, v4 } from "uuid";
 import getContext from "../../util/getContext/util";
+import { storeVectorIds } from "../firebase/storeVectorIds/route";
 
 // ! I'd like for this to be inside the useChat folder, and for the index.js to be in components, but the path redecleration for the API
 // ! Is not working correctly. Leaving it here until I can do a fix.
@@ -32,7 +34,7 @@ const prompt = [
 export async function POST(req) {
   try {
     // Extract messages from the body of request
-    const { messages } = await req.json();
+    const { messages, conversationId, messageCount } = await req.json();
     console.log(messages);
 
     // Get the last message
@@ -47,7 +49,13 @@ export async function POST(req) {
         return `${index + 1}. ${m.metadata.input}`;
       });
       contextString = formattedStrings.join("\n");
+
+      const vectorIds = await context.map((m) => m.id);
+
+      console.log(vectorIds);
       console.log(contextString);
+
+      await storeVectorIds(conversationId, vectorIds);
     } catch (e) {
       console.log(e);
     }

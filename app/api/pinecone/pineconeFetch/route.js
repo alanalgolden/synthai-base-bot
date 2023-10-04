@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, res) {
   const reqData = await req;
-  const id = reqData.headers.get("id");
-  const url = `https://base-bot-92d4948.svc.us-east4-gcp.pinecone.io/vectors/fetch?ids=${id}`;
+  const ids = reqData.headers.get("ids");
+  console.log(ids);
+  //const joinedIds = ids.join("=");
+  console.log("JOINED IDS BELOW");
+  console.log(joinedIds);
+  const url = `https://base-bot-92d4948.svc.us-east4-gcp.pinecone.io/vectors/fetch?ids=${joinedIds}`;
   const options = {
     method: "GET",
     headers: {

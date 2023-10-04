@@ -8,7 +8,7 @@ export async function upsertDoc(collectionId, docID, data) {
   // Uses docId from docId prop
   const docId = docID;
 
-  // Uses collection from the passed in collectionId
+  // Uses collection from the passed in collectionIdc
   const docCollection = collection(db, collectionId);
 
   // Uses docId and docCollection to form full string for setDoc

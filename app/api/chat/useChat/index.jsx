@@ -5,11 +5,19 @@ import { useEffect, useState } from "react";
 import { useMessage } from "../../../../context/MessageContext/context";
 import ReactMarkdown from "react-markdown";
 import { useInspiration } from "../../../../context/InspirationContext/context";
+import { useConversation } from "../../../../context/ConversationContext/context";
+import { v4 as uuidv4, v4 } from "uuid";
+import { conversationLogger } from "../../firebase/conversationLogger/route";
+import { pineconeFetch } from "../../../util/pineconeFetch/util";
+import { getVectorIdsFromDb } from "../../firebase/getVectorIdsFromDb/route";
+import { produce } from "immer";
 
 export default function Chat() {
   // IMPORTED CONTEXT
   const { setMessage } = useMessage();
   const { inspiration } = useInspiration();
+  const { conversation, setConversation, conversationId, setConversationId } =
+    useConversation();
 
   // CHAT CONFIG
   const placeholderConfig = "How can I help?";
@@ -28,8 +36,16 @@ export default function Chat() {
     setIsFinished(false);
   };
 
+  const manageSubmit = async (e) => {
+    handleSubmit(e);
+  };
+
   // CONVERSATION MANAGER
   const { messages, input, handleInputChange, handleSubmit } = useChat({
+    body: {
+      conversationId: conversationId,
+      messageCount: counter,
+    },
     onFinish: toggleFinished,
   });
 
@@ -44,6 +60,19 @@ export default function Chat() {
     e.target.rows = Math.min(currentLines, maxVisibleLines);
   };
 
+  async function handleAssistant() {
+    setMessage(messages[counter]);
+    // Need to get the vectors
+    const ids = await getVectorIdsFromDb(conversationId);
+    //const vectors = await pineconeFetch(ids);
+    //console.log(vectors);
+    await conversationLogger(messages, conversationId, counter, ids);
+    setCounter((prevCounter) => prevCounter + 1);
+    setIsFinished(false);
+    console.log("IS FINISHED MESSAGES BELOW");
+    console.log(messages);
+  }
+
   // EFFECTS
   useEffect(() => {
     // Prevents infinite loop by not allowing function to run if messages[0] is still undefined.
@@ -55,12 +84,16 @@ export default function Chat() {
       }
       // LOGIC : Prevents message from being set until it is fully finished, using the onFinish callback from chat stream.
       else if (messages[counter].role === "assistant" && isFinished === true) {
-        setMessage(messages[counter]);
-        setCounter((prevCounter) => prevCounter + 1);
-        setIsFinished(false);
+        handleAssistant();
       }
     }
   }, [messages, isFinished]);
+
+  useEffect(() => {
+    const uuid = uuidv4();
+    setConversationId(uuid);
+    console.log(uuid);
+  }, []);
 
   // STYLING
   const markdownStyles = {
@@ -120,7 +153,7 @@ export default function Chat() {
                   >
                     {m.content}
                   </ReactMarkdown>
-                  <div className="bg-slate-700 flex-col p-2 rounded-md">
+                  <div className="bg-slate-700 flex-col p-2 rounded-md mt-2">
                     <p className="text-blue-400">Inspiration Vectors:</p>
                     <div>{inspiration}</div>
                   </div>
@@ -131,7 +164,7 @@ export default function Chat() {
         </div>
 
         <div className="bg-slate-500 px-4 ">
-          <form onSubmit={handleSubmit} className="flex items-center">
+          <form onSubmit={manageSubmit} className="flex items-center">
             <textarea
               className="flex-grow my-4 py-2 pl-2 rounded-md bg-slate-700 overflow-auto max-h-[200px]"
               rows="1"

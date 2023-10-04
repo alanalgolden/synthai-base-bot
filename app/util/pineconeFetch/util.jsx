@@ -4,7 +4,7 @@ export const pineconeFetch = async (id) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        id: id,
+        ids: id,
       },
     });
     const data = await response.json();
