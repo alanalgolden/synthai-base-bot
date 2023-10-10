@@ -9,7 +9,7 @@ import { useConversation } from "../../../../context/ConversationContext/context
 import { v4 as uuidv4, v4 } from "uuid";
 import { conversationLogger } from "../../firebase/conversationLogger/route";
 import { pineconeFetch } from "../../../util/pineconeFetch/util";
-import { getVectorIdsFromDb } from "../../firebase/getVectorIdsFromDb/route";
+import { getVectorIdsFromDb } from "../../../util/firebase/getVectorIdsFromDb/util";
 import { produce } from "immer";
 
 export default function Chat() {
@@ -26,6 +26,13 @@ export default function Chat() {
   const [counter, setCounter] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [waiting, setWaiting] = useState(true);
+  const [inspirationStrings, setInspirationStrings] = useState([
+    "test",
+    "test1",
+    "test2",
+    "test3",
+    "test4",
+  ]);
 
   // FUNCTIONS
   const toggleFinished = () => {
@@ -34,6 +41,15 @@ export default function Chat() {
 
   const toggleWaiting = () => {
     setIsFinished(false);
+  };
+
+  const testFunction = async () => {
+    const ids = await getVectorIdsFromDb(conversationId);
+    const parsedIds = await parseIdsForPineconeFetch(ids);
+    const gotIds = await pineconeFetch(parsedIds);
+    console.log(gotIds);
+    const vectorStrings = await transformVectorsToVectorStrings(gotIds);
+    console.log(vectorStrings);
   };
 
   const manageSubmit = async (e) => {
@@ -48,6 +64,28 @@ export default function Chat() {
     },
     onFinish: toggleFinished,
   });
+
+  // MICRO FUNCTIONS
+  const parseIdsForPineconeFetch = async (ids) => {
+    const idsArray = Object.values(ids);
+    const joinedIds = idsArray.join("&ids=");
+    return joinedIds;
+  };
+
+  async function transformVectorsToVectorStrings(data) {
+    let result = {};
+
+    for (let key in data.vectors) {
+      let vector = data.vectors[key];
+
+      result[vector.id] = {
+        text: vector.metadata.input,
+        type: vector.metadata.messageType,
+      };
+    }
+
+    return { ...result };
+  }
 
   // CONTROLS TEXT AREA SIZE
   const handleTextAreaChange = (e) => {
@@ -64,9 +102,10 @@ export default function Chat() {
     setMessage(messages[counter]);
     // Need to get the vectors
     const ids = await getVectorIdsFromDb(conversationId);
-    //const vectors = await pineconeFetch(ids);
-    //console.log(vectors);
-    await conversationLogger(messages, conversationId, counter, ids);
+    const parsedIds = await parseIdsForPineconeFetch(ids);
+    const retrievedVectors = await pineconeFetch(parsedIds);
+    const vectors = await transformVectorsToVectorStrings(retrievedVectors);
+    await conversationLogger(messages, conversationId, counter, vectors);
     setCounter((prevCounter) => prevCounter + 1);
     setIsFinished(false);
     console.log("IS FINISHED MESSAGES BELOW");
@@ -153,10 +192,13 @@ export default function Chat() {
                   >
                     {m.content}
                   </ReactMarkdown>
-                  <div className="bg-slate-700 flex-col p-2 rounded-md mt-2">
-                    <p className="text-blue-400">Inspiration Vectors:</p>
-                    <div>{inspiration}</div>
-                  </div>
+                  {inspirationStrings[counter] ? (
+                    <div className="bg-slate-700 flex-col p-2 rounded-md mt-2">
+                      <p className="text-blue-400">Inspiration Vectors:</p>
+                      <div>{inspirationStrings[counter - 1]}</div>
+                      <div>{inspiration}</div>
+                    </div>
+                  ) : undefined}
                 </div>
               )}
             </div>
@@ -181,6 +223,7 @@ export default function Chat() {
               Send
             </button>
           </form>
+          <button onClick={testFunction}>Test BUTTON</button>
         </div>
       </div>
     </div>

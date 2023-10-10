@@ -11,7 +11,7 @@ import {
 import { db } from "../../../../firebaseConfig";
 import { produce } from "immer";
 
-export async function conversationLogger(message, uuid, msgCount, vectorIds) {
+export async function conversationLogger(message, uuid, msgCount, vectors) {
   const date = new Date();
   const data = {
     created: date,
@@ -47,7 +47,7 @@ export async function conversationLogger(message, uuid, msgCount, vectorIds) {
       const appendVectors = produce(docSnap.data(), (updatedAiMsg) => {
         console.log("AI MSG");
         console.log(updatedAiMsg);
-        updatedAiMsg.messages[msgCount].vectorIds = vectorIds;
+        updatedAiMsg.messages[msgCount].vectors = vectors;
       });
 
       const updatedConversation = await setDoc(docDocument, appendVectors);
@@ -66,7 +66,7 @@ export async function conversationLogger(message, uuid, msgCount, vectorIds) {
       const appendVectors = produce(docSnap.data(), (updatedAiMsg) => {
         console.log("AI MSG");
         console.log(updatedAiMsg);
-        updatedAiMsg.messages[msgCount].vectorIds = vectorIds;
+        updatedAiMsg.messages[msgCount].vectors = vectors;
       });
 
       await setDoc(docDocument, appendVectors);
