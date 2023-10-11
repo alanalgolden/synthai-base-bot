@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebaseConfig";
 
-export const useFirestoreDocument = (collection, id) => {
+export const useFirestoreDocument = (id) => {
   const [documentCache, setDocumentCache] = useState(null);
 
   useEffect(() => {
@@ -17,7 +17,8 @@ export const useFirestoreDocument = (collection, id) => {
       };
       fetchData();
     }
-  }, [collection, id, documentCache]);
+    console.log("USE EFFECT FIRESTORE DOC TRIGGERED");
+  }, [id, documentCache]);
 
   return documentCache;
 };

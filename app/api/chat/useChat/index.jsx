@@ -4,52 +4,34 @@ import { useChat } from "ai/react";
 import { useEffect, useState } from "react";
 import { useMessage } from "../../../../context/MessageContext/context";
 import ReactMarkdown from "react-markdown";
-import { useInspiration } from "../../../../context/InspirationContext/context";
 import { useConversation } from "../../../../context/ConversationContext/context";
 import { v4 as uuidv4, v4 } from "uuid";
 import { conversationLogger } from "../../firebase/conversationLogger/route";
 import { pineconeFetch } from "../../../util/pineconeFetch/util";
 import { getVectorIdsFromDb } from "../../../util/firebase/getVectorIdsFromDb/util";
-import { produce } from "immer";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../../firebaseConfig";
 
 export default function Chat() {
   // IMPORTED CONTEXT
   const { setMessage } = useMessage();
-  const { inspiration } = useInspiration();
-  const { conversation, setConversation, conversationId, setConversationId } =
-    useConversation();
+  const { conversationId, setConversationId } = useConversation();
 
   // CHAT CONFIG
   const placeholderConfig = "How can I help?";
 
+  // HOLDS
+  let conversationDoc;
+
   // REACT
   const [counter, setCounter] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
-  const [waiting, setWaiting] = useState(true);
-  const [inspirationStrings, setInspirationStrings] = useState([
-    "test",
-    "test1",
-    "test2",
-    "test3",
-    "test4",
-  ]);
+  const [cachedDoc, setCachedDoc] = useState(null);
+  const [vectorsForMessages, setVectorsForMessages] = useState({});
 
   // FUNCTIONS
   const toggleFinished = () => {
     setIsFinished(true);
-  };
-
-  const toggleWaiting = () => {
-    setIsFinished(false);
-  };
-
-  const testFunction = async () => {
-    const ids = await getVectorIdsFromDb(conversationId);
-    const parsedIds = await parseIdsForPineconeFetch(ids);
-    const gotIds = await pineconeFetch(parsedIds);
-    console.log(gotIds);
-    const vectorStrings = await transformVectorsToVectorStrings(gotIds);
-    console.log(vectorStrings);
   };
 
   const manageSubmit = async (e) => {
@@ -65,6 +47,15 @@ export default function Chat() {
     onFinish: toggleFinished,
   });
 
+  // FUNCTIONS THAT NEED TO BE MOVED
+  const getVectorsFromDoc = async () => {
+    const docRef = doc(db, "cMm79WMhxwf2c0ERLOwChpwOKj93", conversationId);
+    const docSnap = await getDoc(docRef);
+    console.log(docSnap.data());
+    console.log(docSnap.data().messages[1].vectors);
+    console.log(docSnap.data().messages[1].vectors[0].text);
+  };
+
   // MICRO FUNCTIONS
   const parseIdsForPineconeFetch = async (ids) => {
     const idsArray = Object.values(ids);
@@ -73,19 +64,27 @@ export default function Chat() {
   };
 
   async function transformVectorsToVectorStrings(data) {
-    let result = {};
+    let result = [];
 
     for (let key in data.vectors) {
       let vector = data.vectors[key];
 
-      result[vector.id] = {
+      result.push({
+        id: vector.id,
         text: vector.metadata.input,
         type: vector.metadata.messageType,
-      };
+      });
     }
 
-    return { ...result };
+    return result;
   }
+
+  const cacheDoc = async (collection) => {
+    const docRef = doc(db, collection, conversationId);
+    const docSnap = await getDoc(docRef);
+    const docData = docSnap.data();
+    setCachedDoc(docData);
+  };
 
   // CONTROLS TEXT AREA SIZE
   const handleTextAreaChange = (e) => {
@@ -106,10 +105,9 @@ export default function Chat() {
     const retrievedVectors = await pineconeFetch(parsedIds);
     const vectors = await transformVectorsToVectorStrings(retrievedVectors);
     await conversationLogger(messages, conversationId, counter, vectors);
+    await cacheDoc("cMm79WMhxwf2c0ERLOwChpwOKj93");
     setCounter((prevCounter) => prevCounter + 1);
     setIsFinished(false);
-    console.log("IS FINISHED MESSAGES BELOW");
-    console.log(messages);
   }
 
   // EFFECTS
@@ -134,13 +132,29 @@ export default function Chat() {
     console.log(uuid);
   }, []);
 
+  useEffect(() => {
+    if (!cachedDoc || !cachedDoc.messages) return;
+
+    setVectorsForMessages((prevVectors) => {
+      const newVectorsMap = { ...prevVectors }; // Start by copying the previous vectors
+
+      // Convert the object into an array using Object.values
+      Object.values(cachedDoc.messages).forEach((msg) => {
+        if (msg.id && msg.vectors) {
+          newVectorsMap[msg.id] = msg.vectors; // Update or add new vectors
+        }
+      });
+
+      return newVectorsMap; // Return the merged vectors
+    });
+  }, [cachedDoc]);
+
   // STYLING
   const markdownStyles = {
     h1: "text-2xl font-bold mb-2",
     h2: "text-xl font-bold mb-1",
     h3: "text-lg font-bold",
     h4: "text-base font-semibold",
-    // Add more styles as needed
   };
 
   return (
@@ -192,13 +206,15 @@ export default function Chat() {
                   >
                     {m.content}
                   </ReactMarkdown>
-                  {inspirationStrings[counter] ? (
-                    <div className="bg-slate-700 flex-col p-2 rounded-md mt-2">
-                      <p className="text-blue-400">Inspiration Vectors:</p>
-                      <div>{inspirationStrings[counter - 1]}</div>
-                      <div>{inspiration}</div>
-                    </div>
-                  ) : undefined}
+                  <div className="bg-blue-500 p-2 mt-2 rounded-md">
+                    <p>Inspiration Vectors:</p>
+                    <ul>
+                      {vectorsForMessages[m.id] &&
+                        vectorsForMessages[m.id].map((vector) => (
+                          <li key={vector.id}>{vector.text}</li>
+                        ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
@@ -223,7 +239,6 @@ export default function Chat() {
               Send
             </button>
           </form>
-          <button onClick={testFunction}>Test BUTTON</button>
         </div>
       </div>
     </div>
