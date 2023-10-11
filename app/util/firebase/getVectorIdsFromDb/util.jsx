@@ -11,5 +11,5 @@ export async function getVectorIdsFromDb(docId, msgCount) {
   } else {
     console.log("No such document!");
   }
-  return vectors;
+  return;
 }
